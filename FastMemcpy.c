@@ -77,9 +77,16 @@ void benchmark(int dstalign, int srcalign, size_t size, int times)
 	free(DATA1);
 	free(DATA2);
 
-	printf("result(dst %s, src %s): memcpy_fast=%dms memcpy=%d ms\n",  
-		dstalign? "aligned" : "unalign", 
-		srcalign? "aligned" : "unalign", (int)t2, (int)t1);
+	float lat1 = (float)t1 * 1000000 / times;
+	float lat2 = (float)t2 * 1000000 / times;
+
+	float bw1 = (float)size * times / 1024 / 1024 / 1024 / t1 * 1000;
+	float bw2 = (float)size * times / 1024 / 1024 / 1024 / t2 * 1000;
+
+	printf("result(dst %s, src %s): \tlatency(memcpy_fast:%.1fns memcpy=%.1fns) \tbandwith(memcpy_fast:%.1fGB/s memcpy=%.1fGB/s)\n",
+		dstalign? "aligned" : "unalign",
+		srcalign? "aligned" : "unalign",
+		lat2, lat1, bw2, bw1);
 }
 
 
@@ -126,8 +133,16 @@ void random_bench(int maxsize, int times)
 		memcpy_fast(A + offset1, B + offset2, size);
 	}
 	t2 = gettime() - t2;
-	printf("benchmark random access:\n");
-	printf("memcpy_fast=%dms memcpy=%dms\n\n", (int)t2, (int)t1);
+
+	float lat1 = (float)t1 * 1000000 / times;
+	float lat2 = (float)t2 * 1000000 / times;
+
+	float bw1 = (float)maxsize / 2 * times / 1024 / 1024 / 1024 / t1 * 1000;
+	float bw2 = (float)maxsize / 2 * times / 1024 / 1024 / 1024 / t2 * 1000;
+
+	printf("benchmark random access(size=1~%d bytes, times=%d):\n", maxsize, times);
+	printf("result: \tlatency(memcpy_fast:%.1fns memcpy=%.1fns) \tbandwith(memcpy_fast:%.1fGB/s memcpy=%.1fGB/s)\n",
+		lat2, lat1, bw2, bw1);
 }
 
 
